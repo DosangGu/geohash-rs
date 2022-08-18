@@ -4,14 +4,14 @@ mod tests {
 
     #[test]
     fn it_works() {
-        let geo_hash_string = geohash::cal(0.0, 0.0, 8);
+        let geo_hash_string = geohash::encode(37.5666805, 126.9784147, 8);
         println!("{}", geo_hash_string);
-        assert_eq!(geo_hash_string, String::from("s0000000"));
+        assert_eq!(geo_hash_string, String::from("wydm9qyc"));
     }
 }
 pub mod geohash {
     use std::collections::VecDeque;
-    pub fn cal(latitude: f32, longitude: f32, length_geohash: u32) -> String {
+    pub fn encode(latitude: f32, longitude: f32, length_geohash: u32) -> String {
         let lat_info = CoordInfo {
             bound: [-90.0,90.0],
             coord: latitude
@@ -24,7 +24,7 @@ pub mod geohash {
 
         let geohash_string = (0..length_geohash).into_iter()
                                                         .map(|_| get_geo_bit(&mut coord_queue))
-                                                        .map(|a| encode(&a))
+                                                        .map(|a| encode_b32(&a))
                                                         .collect();
         return geohash_string;
     }
@@ -53,7 +53,7 @@ pub mod geohash {
         bound: [f32;2],
         coord: f32
     }
-    fn encode(i: &u8) -> char {
+    fn encode_b32(i: &u8) -> char {
         if i == &(0u8) {
             return '0';
         } else if i == &(1) {
