@@ -1,3 +1,4 @@
+// get base32 encoded char from u8
 pub fn encode_b32(i: &u8) -> char {
     if i == &(0u8) {
         return '0';

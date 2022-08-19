@@ -34,12 +34,16 @@ pub fn encode(latitude: f32, longitude: f32, length_geohash: u32) -> String {
                                                     .collect();
     return geohash_string;
 }
+/// calculate 5 digit geo-bit from coordinate
+/// return u8
 fn get_geo_bit(coord_queue: &mut VecDeque<CoordInfo>) -> u8 {
     return [4,3,2,1,0].iter()
     .map(|i| cal_bit(coord_queue, *i))
     .reduce(|x, y| x | y)
     .unwrap();
 }
+/// calculate 1 digit geo-bit from coordinate
+/// returns u8
 fn cal_bit(coord_queue: &mut VecDeque<CoordInfo>, i: u32) -> u8 {
     const LEFT: usize = 0;
     const RIGHT: usize = 1;
