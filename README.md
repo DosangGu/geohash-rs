@@ -1,2 +1,2 @@
-# geohash-rust
+# geohash-rs
 geohash crate for rust

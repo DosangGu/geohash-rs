@@ -1,4 +1,4 @@
-//! 'geohash' is a geohash encoder for rust.
+//! 'geohash_rs' is a geohash encoder for rust.
 
 use std::collections::VecDeque;
 /// Encodes gps coordinates to String
@@ -6,7 +6,8 @@ use std::collections::VecDeque;
 /// # Examples
 /// 
 /// ```
-/// let geohash = geohash::encode(37.5666805, 126.9784147, 8);
+/// use geohash_rs;
+/// let geohash = geohash_rs::encode(37.5666805, 126.9784147, 8);
 /// 
 /// assert_eq!(geohash, String::from("wydm9qyc"))
 /// ```
