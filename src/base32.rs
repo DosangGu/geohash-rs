@@ -13,11 +13,11 @@ const BASE32_DECODING: [u8; 128] = [
     0x15, 0x16, 0x17, 0x18, 0x19, 0x1a, 0x1b, 0x1c, 0x1d, 0x1e, 0x1f, b'0', b'0', b'0', b'0', b'0',
 ];
 
-// get base32 encoded char from u8
+/// get base32 encoded char from u8
 pub fn encode_b32(i: &u8) -> char {
     return BASE32_ENCODING[*i as usize];
 }
-// get base32 decoded u8 from char
+/// get base32 decoded u8 from char
 pub fn decode_b32(c: &char) -> u8 {
     if !BASE32_ENCODING.contains(c) {
         panic!("invalid char")

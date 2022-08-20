@@ -1,7 +1,12 @@
 //! 'geohash_rs' is a geohash encoder for rust.
 
 use std::collections::VecDeque;
-mod base32;
+
+pub mod base32;
+
+const LEFT: usize = 0;
+const RIGHT: usize = 1;
+
 /// Encodes gps coordinates to String
 /// 
 /// # Panics
@@ -45,8 +50,8 @@ fn get_geo_bit(coord_queue: &mut VecDeque<&mut CoordInfo>) -> u8 {
 /// calculate 1 digit geo-bit from coordinate
 /// returns u8
 fn cal_bit(coord_queue: &mut VecDeque<&mut CoordInfo>, i: u8) -> u8 {
-    const LEFT: usize = 0;
-    const RIGHT: usize = 1;
+    // const LEFT: usize = 0;
+    // const RIGHT: usize = 1;
     let mut coord_info_inst = coord_queue.pop_front().unwrap();
     let mid = &(coord_info_inst.bound).iter().sum::<f32>() / 2.0;
     if &mid <= &(coord_info_inst.coord) {
@@ -64,8 +69,54 @@ struct CoordInfo {
     coord: f32
 }
 
-pub fn decode(geohash: String) {
+/// Decodes geohash String to gps coordinate bounds
+/// 
+/// # Panics
+/// Panics when geohash String is invalid
+/// 
+/// # Examples
+/// 
+/// ```
+/// use geohash_rs::{self, GPSBoundInfo};
+/// let gps_bounds: GPSBoundInfo = geohash_rs::decode(String::from("wydm9qyc"));
+/// 
+/// assert_eq!(gps_bounds.latitude[0], 37.56654739379883);
+/// assert_eq!(gps_bounds.latitude[1], 37.56671905517578);
+/// assert_eq!(gps_bounds.longitude[0], 126.97826385498047);
+/// assert_eq!(gps_bounds.longitude[1], 126.97860717773438);
+/// ```
+pub fn decode(geohash: String) -> GPSBoundInfo {
     let geo_bits: Vec<u8> = geohash.chars()
                                    .map(|ch| base32::decode_b32(&ch))
                                    .collect();
-} 
+    let mut lat_bound: [f32;2] = [-90.0, 90.0];
+    let mut long_bound: [f32;2] = [-180.0, 180.0];
+    let mut bound_queue = VecDeque::from([&mut long_bound, &mut lat_bound]);
+
+    for bit_5 in geo_bits {
+        cal_coord_bound(&bit_5, &mut bound_queue);
+    }
+
+    return GPSBoundInfo { latitude: lat_bound, longitude: long_bound };
+}
+
+fn cal_coord_bound(bit_5: &u8, bound_queue: &mut VecDeque<&mut [f32;2]>) {
+    for i in [4 as u8, 3, 2, 1, 0] {
+        cal_bound(bit_5, &i, bound_queue)
+    }
+}
+
+fn cal_bound(bit_5: &u8, i: &u8, bound_queue: &mut VecDeque<&mut [f32;2]>) {
+    let bound_info = bound_queue.pop_front().unwrap();
+    let mid = bound_info.iter().sum::<f32>() / 2.0;
+    if 0 < (bit_5 & 1 << i) {
+        bound_info[LEFT] = mid;
+    } else {
+        bound_info[RIGHT] = mid;
+    }
+    bound_queue.push_back(bound_info);
+}
+pub struct GPSBoundInfo {
+    pub latitude: [f32;2],
+    pub longitude: [f32;2]
+}
