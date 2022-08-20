@@ -28,7 +28,7 @@ pub fn encode(latitude: f32, longitude: f32, length_geohash: u32) -> String {
         coord: longitude
     };
     let mut coord_queue = VecDeque::from([long_info, lat_info]);
-    let geohash_string = (0..length_geohash).into_iter()
+    let geohash_string: String = (0..length_geohash).into_iter()
                                                     .map(|_| get_geo_bit(&mut coord_queue))
                                                     .map(|a| base32::encode_b32(&a))
                                                     .collect();
@@ -37,14 +37,14 @@ pub fn encode(latitude: f32, longitude: f32, length_geohash: u32) -> String {
 /// calculate 5 digit geo-bit from coordinate
 /// return u8
 fn get_geo_bit(coord_queue: &mut VecDeque<CoordInfo>) -> u8 {
-    return [4,3,2,1,0].iter()
-    .map(|i| cal_bit(coord_queue, *i))
-    .reduce(|x, y| x | y)
-    .unwrap();
+    return [4 as u8,3,2,1,0].iter()
+                            .map(|i| cal_bit(coord_queue, *i))
+                            .reduce(|x, y| x | y)
+                            .unwrap();
 }
 /// calculate 1 digit geo-bit from coordinate
 /// returns u8
-fn cal_bit(coord_queue: &mut VecDeque<CoordInfo>, i: u32) -> u8 {
+fn cal_bit(coord_queue: &mut VecDeque<CoordInfo>, i: u8) -> u8 {
     const LEFT: usize = 0;
     const RIGHT: usize = 1;
     let mut coord_info_inst = coord_queue.pop_front().unwrap();
@@ -52,7 +52,7 @@ fn cal_bit(coord_queue: &mut VecDeque<CoordInfo>, i: u32) -> u8 {
     if &mid <= &(coord_info_inst.coord) {
         coord_info_inst.bound = [mid, coord_info_inst.bound[RIGHT]];
         coord_queue.push_back(coord_info_inst);
-        return u8::pow(2, i);
+        return 1 << i;
     } else {
         coord_info_inst.bound = [coord_info_inst.bound[LEFT], mid];
         coord_queue.push_back(coord_info_inst);
