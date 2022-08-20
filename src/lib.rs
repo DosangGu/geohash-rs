@@ -50,16 +50,14 @@ fn get_geo_bit(coord_queue: &mut VecDeque<&mut CoordInfo>) -> u8 {
 /// calculate 1 digit geo-bit from coordinate
 /// returns u8
 fn cal_bit(coord_queue: &mut VecDeque<&mut CoordInfo>, i: u8) -> u8 {
-    // const LEFT: usize = 0;
-    // const RIGHT: usize = 1;
     let mut coord_info_inst = coord_queue.pop_front().unwrap();
     let mid = &(coord_info_inst.bound).iter().sum::<f32>() / 2.0;
     if &mid <= &(coord_info_inst.coord) {
-        coord_info_inst.bound = [mid, coord_info_inst.bound[RIGHT]];
+        coord_info_inst.bound[LEFT] = mid;
         coord_queue.push_back(coord_info_inst);
         return 1 << i;
     } else {
-        coord_info_inst.bound = [coord_info_inst.bound[LEFT], mid];
+        coord_info_inst.bound[RIGHT] = mid;
         coord_queue.push_back(coord_info_inst);
         return 0;
     }
@@ -116,6 +114,7 @@ fn cal_bound(bit_5: &u8, i: &u8, bound_queue: &mut VecDeque<&mut [f32;2]>) {
     }
     bound_queue.push_back(bound_info);
 }
+/// GPS bounds information for decoding geohash String.
 pub struct GPSBoundInfo {
     pub latitude: [f32;2],
     pub longitude: [f32;2]
